@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::engine::local::File;
 use surrealdb::Surreal;
+use surrealdb::{engine::local::File, sql::Thing};
 
 use std::io::Write;
 
@@ -16,6 +16,12 @@ use async_openai::{
 #[derive(Debug, Serialize, Deserialize)]
 struct Chat {
     messages: Vec<ChatCompletionRequestMessage>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Record {
+    #[allow(dead_code)]
+    id: Thing,
 }
 
 #[tokio::main]
@@ -87,6 +93,18 @@ async fn main() -> anyhow::Result<()> {
         std::io::stdout().flush()?;
         let response = response.choices.first();
         if let Some(response) = response {
+            messages.push(
+                ChatCompletionRequestMessageArgs::default()
+                    .role(Role::System)
+                    .content(response.message.content.clone().unwrap_or_default())
+                    .build()?,
+            );
+            let _: Record = db
+                .update(("chat", "default_chat"))
+                .content(Chat {
+                    messages: messages.clone(),
+                })
+                .await?;
             println!(
                 "{}",
                 response
