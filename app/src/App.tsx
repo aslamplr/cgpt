@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+import { listChat } from './api';
 
 function App() {
   const [texts, setTexts] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchChat = async () => {
+      const chats = await listChat();
+      console.log(chats);
+    }
+    fetchChat();
+  }, []);
 
   const handleSendText = (text: string) => {
     setTexts([...texts, text]);

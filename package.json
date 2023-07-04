@@ -5,7 +5,10 @@
   "license": "MIT",
   "scripts": {
     "setup": "npm install && npm install --prefix app",
-    "serve": "concurrently --kill-others 'npm run serve --prefix api' 'npm run dev --prefix app' 'npm run start-dev-db --prefix api'",
+    "serve:app": "npm run dev --prefix app",
+    "serve:api": "npm run serve --prefix api",
+    "serve:dev-db": "npm run start-dev-db --prefix api",
+    "serve": "concurrently --kill-others 'npm run serve:api' 'npm run serve:app' 'npm run serve:dev-db'",
     "build": "npm run build --prefix app && npm run build --prefix api",
     "build:lambda": "npm run build --prefix app && npm run build:lambda --prefix api"
   },
