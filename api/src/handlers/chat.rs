@@ -15,33 +15,29 @@ pub async fn new_chat(
     State(state): State<Arc<AppState>>,
     JsonPayload(payload): JsonPayload<ChatRequest>,
 ) -> Result<Json<ChatResponse>, StatusCode> {
-    Ok(Json(
-        state
-            .new_chat(&payload.message)
-            .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
-    ))
+    Ok(Json(state.new_chat(&payload.message).await.map_err(
+        |e| {
+            tracing::error!("Error: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        },
+    )?))
 }
 
 pub async fn get_chat(
     State(state): State<Arc<AppState>>,
     Path(chat_id): Path<String>,
 ) -> Result<Json<ChatHistory>, StatusCode> {
-    Ok(Json(
-        state
-            .get_chat(&chat_id)
-            .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
-    ))
+    Ok(Json(state.get_chat(&chat_id).await.map_err(|e| {
+        tracing::error!("Error: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?))
 }
 
 pub async fn list_chat(State(state): State<Arc<AppState>>) -> Result<Json<ChatList>, StatusCode> {
-    Ok(Json(
-        state
-            .list_chat()
-            .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
-    ))
+    Ok(Json(state.list_chat().await.map_err(|e| {
+        tracing::error!("Error: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?))
 }
 
 pub async fn continue_chat(
@@ -53,7 +49,10 @@ pub async fn continue_chat(
         state
             .continue_chat(&chat_id, &payload.message)
             .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+            .map_err(|e| {
+                tracing::error!("Error: {:?}", e);
+                StatusCode::INTERNAL_SERVER_ERROR
+            })?,
     ))
 }
 
@@ -61,9 +60,9 @@ pub async fn delete_chat(
     State(state): State<Arc<AppState>>,
     Path(chat_id): Path<String>,
 ) -> Result<(), StatusCode> {
-    state
-        .delete_chat(&chat_id)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    state.delete_chat(&chat_id).await.map_err(|e| {
+        tracing::error!("Error: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
     Ok(())
 }

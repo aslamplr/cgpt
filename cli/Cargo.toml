@@ -2,6 +2,8 @@
 name = "cgpt-cli"
 version = "0.1.0"
 edition = "2021"
+authors = ["Aslam Ahammed A <aslamplr@gmail.com>"]
+license = "MIT"
 
 [dependencies]
 anyhow = "1.0.71"

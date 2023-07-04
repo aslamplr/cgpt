@@ -2,7 +2,7 @@ use std::{borrow::Cow, ops::Deref};
 
 use async_openai::types::{ChatCompletionRequestMessage, ChatCompletionRequestMessageArgs, Role};
 use serde::{Deserialize, Serialize};
-use surrealdb::{engine::local::Db, sql::Thing, Surreal};
+use surrealdb::{engine::remote::ws::Client as Ws, sql::Thing, Surreal};
 
 use crate::openai::Client;
 use crate::util::generate_chat_id;
@@ -70,7 +70,7 @@ impl<T: Into<Cow<'static, str>>, K: Into<ChatMessage>> From<(T, Vec<K>)> for Cha
 }
 
 impl AppState {
-    pub fn new(openai_client: Client, db: Surreal<Db>) -> Self {
+    pub fn new(openai_client: Client, db: Surreal<Ws>) -> Self {
         Self { openai_client, db }
     }
 
@@ -217,7 +217,7 @@ impl AppState {
     }
 
     pub async fn delete_chat(&self, chat_id: &str) -> anyhow::Result<()> {
-        self.db.delete(("chat", chat_id)).await?;
+        let _: Record = self.db.delete(("chat", chat_id)).await?;
         Ok(())
     }
 }

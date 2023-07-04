@@ -1,0 +1,22 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.text-area {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 100%;
+    round: 5px;
+    height: 100px;
+}
+
+/* Make it float in the bottom */
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
