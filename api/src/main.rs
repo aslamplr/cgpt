@@ -1,10 +1,13 @@
 use std::sync::Arc;
 
 use anyhow::Context;
+use axum::http::header::{ACCEPT, ACCEPT_ENCODING, AUTHORIZATION, CONTENT_TYPE, ORIGIN};
 use axum::{routing::get, Router};
 use surrealdb::engine::remote::ws::Ws;
 use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
+use tower_http::compression::CompressionLayer;
+use tower_http::cors::CorsLayer;
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
@@ -59,6 +62,19 @@ async fn main() -> anyhow::Result<()> {
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
                 .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
         )
+        .layer(
+            CorsLayer::new()
+                .allow_headers(vec![
+                    ACCEPT,
+                    ACCEPT_ENCODING,
+                    AUTHORIZATION,
+                    CONTENT_TYPE,
+                    ORIGIN,
+                ])
+                .allow_methods(tower_http::cors::Any)
+                .allow_origin(tower_http::cors::Any),
+        )
+        .layer(CompressionLayer::new().gzip(true).deflate(true))
         .with_state(shared_state);
 
     // Start axum server
