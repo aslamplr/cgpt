@@ -14,10 +14,10 @@ use cgpt_api::services::AppState;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    if std::env::var("OPENAI_API_KEY").is_err() {
-        dotenv::dotenv()
-            .with_context(|| "Set OPENAI_API_KEY environment variable or add in .env file")?;
-    }
+    // Initialise environment variables from .env file
+    dotenv::dotenv().with_context(|| "Set required environment variables in .env file")?;
+
+    // Initialise tracing for logging
     let filter = std::env::var("RUST_LOG")
         .unwrap_or_else(|_| "cgpt_api=debug,towe_http=info,info".to_owned());
     tracing_subscriber::fmt()
@@ -26,18 +26,27 @@ async fn main() -> anyhow::Result<()> {
         .compact()
         .init();
 
-    let openai_client = Client::new();
-    let db = Surreal::new::<Ws>("localhost:8000").await?;
+    // Initialise SurrealDB database client and signin
+    let db_url = std::env::var("DB_URL").unwrap_or_else(|_| "localhost:8000".to_owned());
+    let db_username = std::env::var("DB_USERNAME").unwrap_or_else(|_| "root".to_owned());
+    let db_password = std::env::var("DB_PASSWORD").unwrap_or_else(|_| "root".to_owned());
+
+    let db = Surreal::new::<Ws>(db_url.as_str()).await?;
     db.use_ns("cgpt").use_db("default_database").await?;
 
     db.signin(Root {
-        username: "root",
-        password: "root",
+        username: &db_username,
+        password: &db_password,
     })
     .await?;
 
+    // Initialise OpenAI client
+    let openai_client = Client::new();
+
+    // Initialise shared state for axum
     let shared_state = Arc::new(AppState::new(openai_client, db));
 
+    // Setup axum app
     let app = Router::new()
         .route("/", get(|| async { "cgpt REST api service!" }))
         .route("/chat", get(list_chat).post(new_chat))
@@ -52,6 +61,7 @@ async fn main() -> anyhow::Result<()> {
         )
         .with_state(shared_state);
 
+    // Start axum server
     axum::Server::bind(&"0.0.0.0:3000".parse()?)
         .serve(app.into_make_service())
         .await?;
