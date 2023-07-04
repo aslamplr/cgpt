@@ -163,6 +163,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-stream"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd56dd203fef61ac097dd65721a419ddccb106b2d2b70ba60a6b529f03961a51"
+dependencies = [
+ "async-stream-impl",
+ "futures-core",
+ "pin-project-lite",
+]
+
+[[package]]
+name = "async-stream-impl"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16e62a023e7c117e27523144c5d2459f4397fcc3cab0085af8e2224f643a0193"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.23",
+]
+
+[[package]]
 name = "async-task"
 version = "4.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -212,6 +234,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
+name = "aws_lambda_events"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65991dbc3bfb586939ba1527eefdc99bc21157b6ec891f180fb1e16e2dddc7a9"
+dependencies = [
+ "base64 0.21.2",
+ "bytes",
+ "http",
+ "http-body",
+ "http-serde",
+ "query_map",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "axum"
 version = "0.6.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -240,6 +278,21 @@ dependencies = [
  "tokio",
  "tower",
  "tower-layer",
+ "tower-service",
+]
+
+[[package]]
+name = "axum-aws-lambda"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44dbc4a3315ff4e5aeddf2d3ee0372d282dfb3fc2b6d5f6c8b9b983e8880c48b"
+dependencies = [
+ "axum",
+ "bytes",
+ "http",
+ "hyper",
+ "lambda_http",
+ "tower",
  "tower-service",
 ]
 
@@ -432,6 +485,9 @@ name = "bytes"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "89b2fd2a0dcf38d7971e2194b6b6eebab45ae01067456a7fd93d5547a61b70be"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "bzip2-sys"
@@ -475,12 +531,15 @@ dependencies = [
  "anyhow",
  "async-openai",
  "axum",
+ "axum-aws-lambda",
  "dotenv",
+ "lambda_http",
  "rand",
  "serde",
  "serde_json",
  "surrealdb",
  "tokio",
+ "tower",
  "tower-http",
  "tracing",
  "tracing-subscriber",
@@ -1110,6 +1169,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bfe8eed0a9285ef776bb792479ea3834e8b94e13d615c2f66d03dd50a435a29"
 
 [[package]]
+name = "http-serde"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e272971f774ba29341db2f686255ff8a979365a26fb9e4277f6b6d9ec0cdd5e"
+dependencies = [
+ "http",
+ "serde",
+]
+
+[[package]]
 name = "httparse"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1264,6 +1333,62 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5f195fe497f702db0f318b07fdd68edb16955aed830df8363d837542f8f935a"
 dependencies = [
  "wasm-bindgen",
+]
+
+[[package]]
+name = "lambda_http"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b15e8ab48a5d8eab3110567008caad4d191924d1470b74c5c8b802b904b5a34"
+dependencies = [
+ "aws_lambda_events",
+ "base64 0.21.2",
+ "bytes",
+ "encoding_rs",
+ "futures",
+ "http",
+ "http-body",
+ "hyper",
+ "lambda_runtime",
+ "mime",
+ "percent-encoding",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "url",
+]
+
+[[package]]
+name = "lambda_runtime"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9db262b5e9548a371d9e1dd54ba094b75e3e46b345c11458ea2b4d4c54fbffa9"
+dependencies = [
+ "async-stream",
+ "bytes",
+ "futures",
+ "http",
+ "hyper",
+ "lambda_runtime_api_client",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "tokio",
+ "tokio-stream",
+ "tower",
+ "tracing",
+]
+
+[[package]]
+name = "lambda_runtime_api_client"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "690c5ae01f3acac8c9c3348b556fc443054e9b7f1deaf53e9ebab716282bf0ed"
+dependencies = [
+ "http",
+ "hyper",
+ "tokio",
+ "tower-service",
 ]
 
 [[package]]
@@ -1684,6 +1809,17 @@ name = "psl-types"
 version = "2.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33cb294fe86a74cbcf50d4445b37da762029549ebeea341421c7c70370f86cac"
+
+[[package]]
+name = "query_map"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4465aacac3bebc9484cf7a56dc8b2d7feacb657da6002a9198b4f7af4247a204"
+dependencies = [
+ "form_urlencoded",
+ "serde",
+ "serde_derive",
+]
 
 [[package]]
 name = "quote"

@@ -26,6 +26,7 @@ async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(filter)
         .with_target(false)
+        .without_time()
         .compact()
         .init();
 
@@ -77,10 +78,23 @@ async fn main() -> anyhow::Result<()> {
         .layer(CompressionLayer::new().gzip(true).deflate(true))
         .with_state(shared_state);
 
-    // Start axum server
-    axum::Server::bind(&"0.0.0.0:3000".parse()?)
-        .serve(app.into_make_service())
-        .await?;
+    #[cfg(feature = "lambda")]
+    {
+        // Start axum server within lambda runtime
+        let app = tower::ServiceBuilder::new()
+            .layer(axum_aws_lambda::LambdaLayer::default())
+            .service(app);
+
+        lambda_http::run(app).await.expect("failed to run lambda!");
+    }
+
+    #[cfg(not(feature = "lambda"))]
+    {
+        // Start axum server outside lambda runtime
+        axum::Server::bind(&"0.0.0.0:3000".parse()?)
+            .serve(app.into_make_service())
+            .await?;
+    }
 
     Ok(())
 }
