@@ -9,9 +9,9 @@ use axum::{
 use surrealdb::engine::local::File;
 use surrealdb::Surreal;
 
-use cgpt::handlers::chat::{continue_chat, delete_chat, get_chat, list_chat, new_chat};
-use cgpt::openai::Client;
-use cgpt::services::AppState;
+use cgpt_api::handlers::chat::{continue_chat, delete_chat, get_chat, list_chat, new_chat};
+use cgpt_api::openai::Client;
+use cgpt_api::services::AppState;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
