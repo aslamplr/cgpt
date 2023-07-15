@@ -1,0 +1,28 @@
+service: cgpt-api
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  stage: dev
+  region: ap-south-1
+  httpApi:
+    cors: true
+
+package:
+  individually: true
+
+functions:
+  api:
+    runtime: provided.al2
+    architecture: arm64
+    handler: bootstrap
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: any
+    package:
+      artifact: target/lambda/cgpt-api/bootstrap.zip
+    environment:
+      DB_URL: localhost:8000
+      DB_USERNAME: root
+      DB_PASSWORD: root

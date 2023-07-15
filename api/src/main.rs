@@ -1,11 +1,12 @@
+#![warn(clippy::unwrap_used)]
+
 use std::sync::Arc;
 
+#[cfg(not(feature = "lambda"))]
 use anyhow::Context;
 use axum::http::header::{ACCEPT, ACCEPT_ENCODING, AUTHORIZATION, CONTENT_TYPE, ORIGIN};
 use axum::{routing::get, Router};
-use surrealdb::engine::remote::ws::Ws;
-use surrealdb::opt::auth::Root;
-use surrealdb::Surreal;
+use surrealdb::{engine::remote::ws::Ws, opt::auth::Root, Surreal};
 use tower_http::compression::CompressionLayer;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::{self, TraceLayer};
@@ -17,8 +18,11 @@ use cgpt_api::services::AppState;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // Initialise environment variables from .env file
-    dotenv::dotenv().with_context(|| "Set required environment variables in .env file")?;
+    #[cfg(not(feature = "lambda"))]
+    {
+        // Initialise environment variables from .env file
+        dotenv::dotenv().with_context(|| "Set required environment variables in .env file")?;
+    }
 
     // Initialise tracing for logging
     let filter = std::env::var("RUST_LOG")
@@ -27,6 +31,7 @@ async fn main() -> anyhow::Result<()> {
         .with_env_filter(filter)
         .with_target(false)
         .without_time()
+        .with_ansi(false)
         .compact()
         .init();
 
@@ -80,11 +85,6 @@ async fn main() -> anyhow::Result<()> {
 
     #[cfg(feature = "lambda")]
     {
-        // Start axum server within lambda runtime
-        let app = tower::ServiceBuilder::new()
-            .layer(axum_aws_lambda::LambdaLayer::default())
-            .service(app);
-
         lambda_http::run(app).await.expect("failed to run lambda!");
     }
 

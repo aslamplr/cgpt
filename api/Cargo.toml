@@ -9,7 +9,6 @@ license = "MIT"
 anyhow = "1.0.71"
 async-openai = "0.12.1"
 axum = "0.6.18"
-axum-aws-lambda = { version = "0.5.0", optional = true }
 dotenv = "0.15.0"
 lambda_http = { version = "0.8.1", optional = true }
 rand = "0.8.5"
@@ -17,6 +16,7 @@ serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.99"
 surrealdb = { version = "1.0.0-beta.9" }
 tokio = { version = "1.29.1", features = ["full"] }
+# tokio-stream = { version = "0.1.14", features = ["full"]}
 tower = { version = "0.4.13", optional = true }
 tower-http = { version = "0.4.1", features = ["trace", "cors", "compression-gzip", "compression-deflate"] }
 tracing = "0.1.37"
@@ -24,4 +24,4 @@ tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
 
 [features]
 default = []
-lambda = ["lambda_http", "axum-aws-lambda", "tower"]
+lambda = ["lambda_http", "tower"]
