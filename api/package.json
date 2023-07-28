@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "serve": "cargo watch -x run",
-    "build": "cargo build --release",
-    "build:lambda": "cargo lambda build --features lambda --arm64 --release --output-format zip",
+    "build": "cargo build -p cgpt-api",
+    "build:lambda": "cargo lambda build -p cgpt-api --features lambda --arm64 --release --output-format zip",
     "start-dev-db": "docker-compose -f docker-compose.dev.yml up"
   }
 }
